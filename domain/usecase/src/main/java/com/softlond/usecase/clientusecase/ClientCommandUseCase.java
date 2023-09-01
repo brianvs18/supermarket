@@ -57,8 +57,9 @@ public class ClientCommandUseCase {
     private Mono<Client> validateIfDocumentAlreadyRegistered(Client client) {
         return Mono.just(client)
                 .flatMap(clientDTO -> clientRepository.findByDocument(client.getDocument())
-                        .filter(clientModel -> clientModel.getId().equals(client.getId()))
-                        .switchIfEmpty(Mono.error(new ClientException(ClientErrorEnum.DOCUMENT_ALREADY_REGISTERED))))
+                        .flatMap(clientModel -> Mono.just(clientModel)
+                                .filter(clientData -> clientModel.getId().equals(client.getId()))
+                                .switchIfEmpty(Mono.error(new ClientException(ClientErrorEnum.DOCUMENT_ALREADY_REGISTERED)))))
                 .defaultIfEmpty(client);
     }
 
