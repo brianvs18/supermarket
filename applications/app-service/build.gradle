@@ -1,0 +1,30 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+	implementation project( ':reactive-web')
+	implementation project( ':jpa-repository')
+	implementation 'org.reactivecommons.utils:object-mapper:0.1.0'
+    implementation project(':model')
+    implementation project(':usecase')
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql:42.6.0'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    runtimeOnly('org.springframework.boot:spring-boot-devtools')
+    testImplementation 'com.tngtech.archunit:archunit:1.0.1'
+}
+
+tasks.register('explodedJar', Copy) {
+    with jar
+    into "${buildDir}/exploded"
+}
+
+jar {
+    // To disable the *-plain.jar
+    enabled = false
+}
+
+bootJar {
+    // Sets output jar name
+    archiveFileName = "${project.getParent().getName()}.${archiveExtension.get()}"
+}
