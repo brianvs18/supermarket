@@ -1,30 +1,31 @@
 package com.softlond.api.category;
 
+import com.softlond.model.category.Category;
 import com.softlond.usecase.categoryusecase.CategoryHandlerUseCase;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Component
+@RestController
+@RequestMapping(path = "/api/categories")
 @RequiredArgsConstructor
 public class CategoryHandler {
 
     private final CategoryHandlerUseCase categoryHandlerUseCase;
 
-    public Mono<ServerResponse> findAllCategories() {
-        return categoryHandlerUseCase.findAllCategories()
-                .collectList()
-                .flatMap(categories -> ServerResponse.ok().bodyValue(categories))
-                .switchIfEmpty(ServerResponse.notFound().build());
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public Flux<Category> findAll() {
+        return categoryHandlerUseCase.findAllCategories();
     }
 
-    public Mono<ServerResponse> findByCategoryId(ServerRequest serverRequest) {
-        String categoryId = serverRequest.queryParam("id").orElse("");
-        return categoryHandlerUseCase.findByCategoryId(categoryId)
-                .flatMap(category -> ServerResponse.ok().bodyValue(category))
-                .switchIfEmpty(ServerResponse.notFound().build());
+    @GetMapping(path = "/find-by-id", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public Mono<Category> findById(@RequestParam(value = "id") final String id) {
+        return categoryHandlerUseCase.findByCategoryId(id);
     }
 
 }

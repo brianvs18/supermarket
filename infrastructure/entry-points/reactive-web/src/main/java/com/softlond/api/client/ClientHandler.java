@@ -1,29 +1,30 @@
 package com.softlond.api.client;
 
+import com.softlond.model.client.Client;
 import com.softlond.usecase.clientusecase.ClientHandlerUseCase;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Component
+@RestController
+@RequestMapping(path = "/api/clients")
 @RequiredArgsConstructor
 public class ClientHandler {
 
     private final ClientHandlerUseCase clientHandlerUseCase;
 
-    public Mono<ServerResponse> findAllClients() {
-        return clientHandlerUseCase.findAllClients()
-                .collectList()
-                .flatMap(clients -> ServerResponse.ok().bodyValue(clients))
-                .switchIfEmpty(ServerResponse.notFound().build());
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public Flux<Client> findAll() {
+        return clientHandlerUseCase.findAllClients();
     }
 
-    public Mono<ServerResponse> findByClientId(ServerRequest serverRequest) {
-        String clientId = serverRequest.queryParam("id").orElse("");
-        return clientHandlerUseCase.findByClientId(clientId)
-                .flatMap(client -> ServerResponse.ok().bodyValue(client))
-                .switchIfEmpty(ServerResponse.notFound().build());
+    @GetMapping(path = "/find-by-id", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public Mono<Client> findById(@RequestParam(value = "id") final String id) {
+        return clientHandlerUseCase.findByClientId(id);
     }
 }

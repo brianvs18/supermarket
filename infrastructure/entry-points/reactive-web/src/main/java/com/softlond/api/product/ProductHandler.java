@@ -1,29 +1,30 @@
 package com.softlond.api.product;
 
+import com.softlond.model.product.Product;
 import com.softlond.usecase.productusecase.ProductHandlerUseCase;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Component
+@RestController
+@RequestMapping(path = "/api/products")
 @RequiredArgsConstructor
 public class ProductHandler {
 
     private final ProductHandlerUseCase productHandlerUseCase;
 
-    public Mono<ServerResponse> findAllProducts(){
-        return productHandlerUseCase.findAllProducts()
-                .collectList()
-                .flatMap(products -> ServerResponse.ok().bodyValue(products))
-                .switchIfEmpty(ServerResponse.notFound().build());
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public Flux<Product> findAll() {
+        return productHandlerUseCase.findAllProducts();
     }
 
-    public Mono<ServerResponse> findByProductId(ServerRequest serverRequest){
-        String productId = serverRequest.queryParam("id").orElse("");
-        return productHandlerUseCase.findByProductId(productId)
-                .flatMap(product -> ServerResponse.ok().bodyValue(product))
-                .switchIfEmpty(ServerResponse.notFound().build());
+    @GetMapping(path = "/find-by-id", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public Mono<Product> findById(@RequestParam(value = "id") final String id) {
+        return productHandlerUseCase.findByProductId(id);
     }
 }
