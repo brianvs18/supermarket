@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import java.util.logging.Logger;
 
 import static com.softlond.model.utils.GenerateId.randomId;
 
@@ -15,13 +16,17 @@ import static com.softlond.model.utils.GenerateId.randomId;
 public class ClientCommandUseCase {
 
     private final ClientRepository clientRepository;
+    Logger log = Logger.getLogger(ClientCommandUseCase.class.getName());
 
     public Mono<Client> saveClient(Client client) {
+        log.info("*** ENTER TO ClientCommandUseCase :: saveClient - document: " + client.getDocument());
         return Mono.just(client)
                 .filter(clientData -> Objects.nonNull(client.getId()) && !client.getId().isEmpty())
                 .flatMap(clientData -> buildUpdateClient(client))
                 .switchIfEmpty(buildNewClient(client))
-                .flatMap(clientRepository::saveClient);
+                .flatMap(clientRepository::saveClient)
+                .doOnError(error -> log.severe("*** ERROR IN ClientCommandUseCase :: saveClient " + error.getMessage()))
+                .doOnSuccess(success -> log.info("Client saved successfully"));
     }
 
     private Mono<Client> buildUpdateClient(Client client) {
