@@ -1,4 +1,5 @@
 package com.softlond.model.sale;
+
 import lombok.*;
 
 
@@ -8,8 +9,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class Sale {
+
     private String id;
     private String clientId;
     private Long creationDate;
+    private Long totalSale;
 
 }
