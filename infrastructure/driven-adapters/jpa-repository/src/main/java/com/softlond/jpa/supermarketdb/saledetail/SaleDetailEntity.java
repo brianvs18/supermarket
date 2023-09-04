@@ -28,6 +28,6 @@ public class SaleDetailEntity {
     @Column(name = "product_price")
     private long productPrice;
     @Column(name = "product_total")
-    private long productTotal;
+    private long totalProductPrice;
 
 }

@@ -15,7 +15,7 @@ public class SaleDetail {
     private String productId;
     private String productName;
     private int productAmount;
-    private double productPrice;
-    private long productTotal;
+    private long productPrice;
+    private long totalProductPrice;
 
 }

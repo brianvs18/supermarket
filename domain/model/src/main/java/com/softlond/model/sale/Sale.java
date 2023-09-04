@@ -1,6 +1,9 @@
 package com.softlond.model.sale;
 
+import com.softlond.model.saledetail.SaleDetail;
 import lombok.*;
+
+import java.util.List;
 
 
 @Getter
@@ -14,5 +17,6 @@ public class Sale {
     private String clientId;
     private Long creationDate;
     private Long totalSale;
+    private List<SaleDetail> saleDetails;
 
 }
