@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Clock;
-
+import static com.softlond.model.utils.DateFunctions.getActualTime;
 import static com.softlond.model.utils.GenerateId.randomId;
 
 @RequiredArgsConstructor
@@ -53,7 +52,7 @@ public class SaleCommandUseCase {
                 .map(sale -> Sale.builder()
                         .id(randomId())
                         .clientId(saleData.getClientId())
-                        .creationDate(Clock.systemDefaultZone().millis())
+                        .creationDate(getActualTime())
                         .totalSale(calculateTotalSale(saleData))
                         .build())
                 .flatMap(saleRepository::saveSale);
