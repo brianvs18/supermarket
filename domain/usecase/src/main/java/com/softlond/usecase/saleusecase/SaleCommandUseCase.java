@@ -34,6 +34,8 @@ public class SaleCommandUseCase {
 
     Logger log = Logger.getLogger(SaleCommandUseCase.class.getName());
 
+    private static final int ZERO = 0;
+
     public Mono<Sale> saveSale(Sale sale) {
         log.info("*** ENTER TO SaleCommandUseCase :: saveSale - clientId: " + sale.getClientId());
 
@@ -124,7 +126,7 @@ public class SaleCommandUseCase {
     private Mono<Product> validateProductExistsAndStock(SaleDetail saleDetailDTO, Mono<Map<String, Product>> productListMap) {
         return productListMap.map(productData -> productData.get(saleDetailDTO.getProductId()))
                 .switchIfEmpty(Mono.error(new ProductException(ProductErrorEnum.PRODUCT_NOT_FOUND)))
-                .filter(product -> product.getStock() > 0 && product.getStock() >= saleDetailDTO.getProductAmount())
+                .filter(product -> product.getStock() > ZERO && product.getStock() >= saleDetailDTO.getProductAmount())
                 .switchIfEmpty(Mono.error(new ProductException(ProductErrorEnum.PRODUCT_IS_OUT_OF_STOCK)));
     }
 
