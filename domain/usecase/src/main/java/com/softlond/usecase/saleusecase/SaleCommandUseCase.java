@@ -2,8 +2,10 @@ package com.softlond.usecase.saleusecase;
 
 import com.softlond.model.client.gateways.ClientRepository;
 import com.softlond.model.enums.ClientErrorEnum;
+import com.softlond.model.enums.GenericErrorEnum;
 import com.softlond.model.enums.ProductErrorEnum;
 import com.softlond.model.exceptions.ClientException;
+import com.softlond.model.exceptions.GenericException;
 import com.softlond.model.exceptions.ProductException;
 import com.softlond.model.product.Product;
 import com.softlond.model.product.gateways.ProductRepository;
@@ -16,6 +18,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.softlond.model.utils.DateFunctions.getActualTime;
 import static com.softlond.model.utils.GenerateId.randomId;
@@ -35,13 +39,20 @@ public class SaleCommandUseCase {
                 .collectMap(Product::getId);
 
         return Mono.just(sale)
+                .filter(this::validateData)
                 .flatMap(saleDTO -> validateIfClientExists(sale))
                 .flatMap(saleDTO -> buildTotalPriceAndNameByProduct(sale, productMap))
                 .flatMap(saleDTO -> Mono.just(saleDTO)
                         .flatMap(this::buildSaleAndSave)
                         .flatMap(saleSaved -> buildSaleDetailAndSave(saleDTO, saleSaved))
-                        .flatMap(saleSaved -> updateProductStock(saleDTO, productMap))
-                );
+                        .flatMap(saleSaved -> updateProductStock(saleDTO, productMap)))
+                .switchIfEmpty(Mono.error(new GenericException(GenericErrorEnum.PAYLOAD_DOES_NOT_CONTAIN_MINIMUM_VALIDATION)));
+    }
+
+    private boolean validateData(Sale sale) {
+        return Objects.nonNull(sale.getClientId())
+                && !sale.getClientId().isEmpty()
+                && !sale.getSaleDetails().isEmpty();
     }
 
     private Mono<Sale> updateProductStock(Sale saleDTO, Mono<Map<String, Product>> productMap) {
