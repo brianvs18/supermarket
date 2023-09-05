@@ -25,8 +25,7 @@ public class ClientCommandUseCase {
                 .flatMap(clientData -> buildUpdateClient(client))
                 .switchIfEmpty(buildNewClient(client))
                 .flatMap(clientRepository::saveClient)
-                .doOnError(error -> log.severe("*** ERROR IN ClientCommandUseCase :: saveClient " + error.getMessage()))
-                .doOnSuccess(success -> log.info("Client saved successfully"));
+                .doOnError(error -> log.severe("*** ERROR IN ClientCommandUseCase :: saveClient " + error.getMessage()));
     }
 
     private Mono<Client> buildUpdateClient(Client client) {
