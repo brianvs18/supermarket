@@ -3,7 +3,6 @@ package com.softlond.jpa.supermarketdb.category;
 import com.softlond.jpa.helper.AdapterOperations;
 import com.softlond.model.category.Category;
 import com.softlond.model.category.gateways.CategoryRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;

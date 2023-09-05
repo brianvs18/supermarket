@@ -1,7 +1,7 @@
 package com.softlond.config;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.softlond.jpa.config.DBSecret;
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

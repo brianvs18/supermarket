@@ -13,7 +13,6 @@ import com.softlond.model.sale.Sale;
 import com.softlond.model.sale.gateways.SaleRepository;
 import com.softlond.model.saledetail.SaleDetail;
 import com.softlond.model.saledetail.gateways.SaleDetailRepository;
-import com.softlond.usecase.clientusecase.ClientCommandUseCase;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
