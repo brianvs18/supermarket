@@ -98,7 +98,7 @@ public class SaleCommandUseCase {
         return getByProductId(saleDetailDTO)
                 .switchIfEmpty(Mono.error(new ProductException(ProductErrorEnum.PRODUCT_NOT_FOUND)))
                 .filter(product -> product.getStock() > 0 && product.getStock() >= saleDetailDTO.getProductAmount())
-                .switchIfEmpty(Mono.error(new ProductException(ProductErrorEnum.NO_AVAILABLE_STOCK)));
+                .switchIfEmpty(Mono.error(new ProductException(ProductErrorEnum.PRODUCT_IS_OUT_OF_STOCK)));
     }
 
     private Mono<Product> getByProductId(SaleDetail saleDetailDTO) {
