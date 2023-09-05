@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 import static com.softlond.model.utils.DateFunctions.getActualTime;
 import static com.softlond.model.utils.GenerateId.randomId;
 
@@ -27,19 +29,24 @@ public class SaleCommandUseCase {
     private final ProductRepository productRepository;
 
     public Mono<Sale> saveSale(Sale sale) {
+
+        Mono<Map<String, Product>> productMap = Flux.fromIterable(sale.getSaleDetails())
+                .flatMap(saleDetail -> productRepository.findByProductId(saleDetail.getProductId()))
+                .collectMap(Product::getId);
+
         return Mono.just(sale)
                 .flatMap(saleDTO -> validateIfClientExists(sale))
-                .flatMap(saleDTO -> calculateTotalPriceByProduct(sale))
+                .flatMap(saleDTO -> buildTotalPriceAndNameByProduct(sale, productMap))
                 .flatMap(saleDTO -> Mono.just(saleDTO)
                         .flatMap(this::buildSaleAndSave)
                         .flatMap(saleSaved -> buildSaleDetailAndSave(saleDTO, saleSaved))
-                        .flatMap(saleSaved -> updateProductStock(saleDTO))
+                        .flatMap(saleSaved -> updateProductStock(saleDTO, productMap))
                 );
     }
 
-    private Mono<Sale> updateProductStock(Sale saleDTO) {
+    private Mono<Sale> updateProductStock(Sale saleDTO, Mono<Map<String, Product>> productMap) {
         return Flux.fromIterable(saleDTO.getSaleDetails())
-                .flatMap(saleDetail -> getByProductId(saleDetail)
+                .flatMap(saleDetail -> productMap.map(productData -> productData.get(saleDetail.getProductId()))
                         .map(product -> product.toBuilder()
                                 .stock(product.getStock() - saleDetail.getProductAmount())
                                 .build())
@@ -81,11 +88,12 @@ public class SaleCommandUseCase {
                 .sum();
     }
 
-    private Mono<Sale> calculateTotalPriceByProduct(Sale sale) {
+    private Mono<Sale> buildTotalPriceAndNameByProduct(Sale sale, Mono<Map<String, Product>> productMap) {
         return Flux.fromIterable(sale.getSaleDetails())
                 .flatMap(saleDetail -> Mono.just(saleDetail)
-                        .flatMap(this::validateProductExistsAndStock)
+                        .flatMap(saleDetailDTO -> validateProductExistsAndStock(saleDetailDTO, productMap))
                         .map(product -> saleDetail.toBuilder()
+                                .productName(product.getName())
                                 .totalProductPrice(saleDetail.getProductAmount() * saleDetail.getProductPrice())
                                 .build()))
                 .collectList()
@@ -94,14 +102,11 @@ public class SaleCommandUseCase {
                         .build());
     }
 
-    private Mono<Product> validateProductExistsAndStock(SaleDetail saleDetailDTO) {
-        return getByProductId(saleDetailDTO)
+    private Mono<Product> validateProductExistsAndStock(SaleDetail saleDetailDTO, Mono<Map<String, Product>> productMap) {
+        return productMap.map(productData -> productData.get(saleDetailDTO.getProductId()))
                 .switchIfEmpty(Mono.error(new ProductException(ProductErrorEnum.PRODUCT_NOT_FOUND)))
                 .filter(product -> product.getStock() > 0 && product.getStock() >= saleDetailDTO.getProductAmount())
                 .switchIfEmpty(Mono.error(new ProductException(ProductErrorEnum.PRODUCT_IS_OUT_OF_STOCK)));
     }
 
-    private Mono<Product> getByProductId(SaleDetail saleDetailDTO) {
-        return productRepository.findByProductId(saleDetailDTO.getProductId());
-    }
 }
