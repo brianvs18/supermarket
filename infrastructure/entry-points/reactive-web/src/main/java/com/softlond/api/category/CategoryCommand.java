@@ -1,21 +1,28 @@
 package com.softlond.api.category;
 
+import com.softlond.api.dto.CategoryDTO;
 import com.softlond.model.category.Category;
+import com.softlond.modeldriver.ModelMapper;
 import com.softlond.usecase.categoryusecase.CategoryCommandUseCase;
-import lombok.RequiredArgsConstructor;
+import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping(path = "/api/categories")
-@RequiredArgsConstructor
-public class CategoryCommand {
+public class CategoryCommand extends ModelMapper<Category, CategoryDTO> {
 
     private final CategoryCommandUseCase categoryCommandUseCase;
 
+    protected CategoryCommand(ObjectMapper mapper, CategoryCommandUseCase categoryCommandUseCase) {
+        super(mapper);
+        this.categoryCommandUseCase = categoryCommandUseCase;
+    }
+
     @PostMapping("/category")
-    public Mono<Category> saveCategory(@RequestBody Category category) {
-        return categoryCommandUseCase.saveCategory(category);
+    public Mono<CategoryDTO> saveCategory(@RequestBody CategoryDTO categoryDTO) {
+        return categoryCommandUseCase.saveCategory(this.dtoToModel(categoryDTO))
+                .map(this::modelToDTO);
     }
 
     @DeleteMapping("/category")
