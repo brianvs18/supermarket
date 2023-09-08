@@ -2,7 +2,7 @@ package com.softlond.api.category;
 
 import com.softlond.api.dto.CategoryDTO;
 import com.softlond.model.category.Category;
-import com.softlond.modeldriver.ModelMapper;
+import com.softlond.modelconverter.ModelMapper;
 import com.softlond.usecase.categoryusecase.CategoryCommandUseCase;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.web.bind.annotation.*;

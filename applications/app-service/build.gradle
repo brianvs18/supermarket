@@ -1,6 +1,7 @@
 apply plugin: 'org.springframework.boot'
 
 dependencies {
+	implementation project( ':modelconverter')
     implementation project(':modelconverter')
     implementation project( ':reactive-web')
 	implementation project( ':jpa-repository')
