@@ -29,12 +29,14 @@ public class SaleRepositoryAdapter extends AdapterOperations<Sale, SaleEntity, S
 
     @Override
     public Flux<Sale> findAllByClientId(String clientId) {
-        return null;
+        return Flux.fromIterable(repository.findAllByClientId(clientId))
+                .map(this::toEntity);
     }
 
     @Override
     public Flux<Sale> findAllByDate(Long date) {
-        return null;
+        return Flux.fromIterable(repository.findAllByDate(date))
+                .map(this::toEntity);
     }
 
     @Override

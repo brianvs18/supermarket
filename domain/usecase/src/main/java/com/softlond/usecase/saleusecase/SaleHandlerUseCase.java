@@ -18,6 +18,22 @@ public class SaleHandlerUseCase {
 
     public Flux<Sale> findAllSales() {
         log.info("*** ENTER TO SaleHandlerUseCase :: findAllSales");
-        return null;
+        return saleRepository.findAllSales()
+                .flatMap(sale -> saleDetailRepository.findAllBySaleId(sale.getId())
+                        .collectList()
+                        .map(saleDetailList -> sale.toBuilder()
+                                .saleDetails(saleDetailList)
+                                .build())
+                );
+    }
+
+    public Flux<Sale> findAllByDate(Long date) {
+        log.info("*** ENTER TO SaleHandlerUseCase :: findAllByDate");
+        return saleRepository.findAllByDate(date);
+    }
+
+    public Flux<Sale> findAllByClientId(String clientId) {
+        log.info("*** ENTER TO SaleHandlerUseCase :: findAllByClientId");
+        return saleRepository.findAllByClientId(clientId);
     }
 }
