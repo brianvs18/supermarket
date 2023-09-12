@@ -22,13 +22,10 @@ public class SaleHandler {
         return saleHandlerUseCase.findAllSales();
     }
 
-    @GetMapping(path = "/find-by-date", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public Flux<Sale> findAllByDate(@RequestParam(value = "date") final Long date) {
-        return saleHandlerUseCase.findAllByDate(date);
-    }
-
-    @GetMapping(path = "/find-by-clientId", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public Flux<Sale> findAllByClientId(@RequestParam(value = "clientId") final String clientId) {
-        return saleHandlerUseCase.findAllByClientId(clientId);
+    @GetMapping(path = "/find-by-filters", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public Flux<Sale> findAllByFilters(@RequestParam(value = "clientId", required = false) final String clientId,
+                                       @RequestParam(value = "initialDate", required = false) final Long initialDate,
+                                       @RequestParam(value = "finalDate", required = false) final Long finalDate) {
+        return saleHandlerUseCase.findAllByFilters(clientId, initialDate, finalDate);
     }
 }

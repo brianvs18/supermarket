@@ -28,20 +28,9 @@ public class SaleRepositoryAdapter extends AdapterOperations<Sale, SaleEntity, S
     }
 
     @Override
-    public Flux<Sale> findAllByClientId(String clientId) {
-        return Flux.fromIterable(repository.findAllByClientId(clientId))
+    public Flux<Sale> findAllByFilters(String clientId, Long initialDate, Long finalDate) {
+        return Flux.fromIterable(repository.findAllByFilters(clientId, initialDate, finalDate))
                 .map(this::toEntity);
-    }
-
-    @Override
-    public Flux<Sale> findAllByDate(Long date) {
-        return Flux.fromIterable(repository.findAllByDate(date))
-                .map(this::toEntity);
-    }
-
-    @Override
-    public Flux<Sale> findAllByClientIdAndBetweenDate(String clientId, Long initialDate, Long finalDate) {
-        return null;
     }
 
     @Override

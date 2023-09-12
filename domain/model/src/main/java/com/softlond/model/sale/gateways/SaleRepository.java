@@ -10,11 +10,7 @@ public interface SaleRepository {
 
     Mono<Sale> findBySaleId(String id);
 
-    Flux<Sale> findAllByClientId(String clientId);
-
-    Flux<Sale> findAllByDate(Long date);
-
-    Flux<Sale> findAllByClientIdAndBetweenDate(String clientId, Long initialDate, Long finalDate);
+    Flux<Sale> findAllByFilters(String clientId, Long initialDate, Long finalDate);
 
     Mono<Sale> saveSale(Sale sale);
 }
