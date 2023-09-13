@@ -49,7 +49,7 @@ public class SaleCommandUseCase {
         return Mono.just(sale)
                 .filter(this::validateData)
                 .flatMap(saleDTO -> validateIfClientExists(sale))
-                .flatMap(saleDTO -> buildTotalPriceAndNameByProduct(sale, productListMap))
+                .flatMap(saleDTO -> buildProductNameAndPriceAndCalculateTotalPrice(sale, productListMap))
                 .flatMap(saleDTO -> Mono.just(saleDTO)
                         .flatMap(this::buildSaleAndSave)
                         .flatMap(saleSaved -> buildSaleDetailAndSave(saleDTO, saleSaved))
@@ -109,7 +109,7 @@ public class SaleCommandUseCase {
                 .sum();
     }
 
-    private Mono<Sale> buildTotalPriceAndNameByProduct(Sale sale, Mono<Map<String, Product>> productListMap) {
+    private Mono<Sale> buildProductNameAndPriceAndCalculateTotalPrice(Sale sale, Mono<Map<String, Product>> productListMap) {
         return Flux.fromIterable(sale.getSaleDetails())
                 .flatMap(saleDetail -> Mono.just(saleDetail)
                         .flatMap(saleDetailDTO -> validateProductExistsAndStock(saleDetailDTO, productListMap))
